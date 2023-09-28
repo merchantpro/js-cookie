@@ -43,13 +43,15 @@ function init(converter, defaultAttributes) {
     }
 
     return (document.cookie =
-      name + '=' + converter.write(value, name) + stringifiedAttributes)
+      converter.write(name, 'name') + '=' + converter.write(value, 'value') + stringifiedAttributes)
   }
 
   function get(name) {
     if (typeof document === 'undefined' || (arguments.length && !name)) {
       return
     }
+
+    name = converter.read(name, 'name');
 
     // To prevent the for loop in the first place assign an empty array
     // in case there are no cookies at all.
@@ -61,7 +63,7 @@ function init(converter, defaultAttributes) {
 
       try {
         var found = decodeURIComponent(parts[0])
-        if (!(found in jar)) jar[found] = converter.read(value, found)
+        if (!(found in jar)) jar[found] = converter.read(value, found, 'value')
         if (name === found) {
           break
         }

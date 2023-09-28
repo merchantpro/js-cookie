@@ -62,6 +62,7 @@
         attributes.expires = attributes.expires.toUTCString();
       }
 
+      console.log(name);
       // name = encodeURIComponent(name)
       //   .replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent)
       //   .replace(/[()]/g, escape)
@@ -89,7 +90,10 @@
       }
 
       return (document.cookie =
-        converter.write(name, 'name') + '=' + converter.write(value, 'value') + stringifiedAttributes)
+        converter.write(name, 'name') +
+        '=' +
+        converter.write(value, 'value') +
+        stringifiedAttributes)
     }
 
     function get(name) {

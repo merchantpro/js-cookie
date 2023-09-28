@@ -1,3 +1,4 @@
 node_modules
 .sizecache.json
 *.log*
+yarn.lock

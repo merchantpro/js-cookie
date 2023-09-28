@@ -21,35 +21,33 @@
   }
 
   var defaultConverter = {
-    read: function (value, type) {
-      if (type === 'value') {
-        if (value[0] === '"') {
-          value = value.slice(1, -1);
-        }
-        return value.replace(/(%[\dA-F]{2})+/gi, decodeURIComponent)
+    read: function (value) {
+      if (value[0] === '"') {
+        value = value.slice(1, -1);
       }
-      else {
-        return value;
-      }
+      return value.replace(/(%[\dA-F]{2})+/gi, decodeURIComponent)
     },
-    write: function (value, type) {
-      if (type === 'value') {
-        return encodeURIComponent(value).replace(
-            /%(2[346BF]|3[AC-F]|40|5[BDE]|60|7[BCD])/g,
-            decodeURIComponent
-        )
-      }
-      else {
-        return encodeURIComponent(value).replace(
-            /%(2[346B]|5E|60|7C)/g, decodeURIComponent)
-        .replace(/[()]/g, escape)
-      }
+    write: function (value) {
+      return encodeURIComponent(value).replace(
+        /%(2[346BF]|3[AC-F]|40|5[BDE]|60|7[BCD])/g,
+        decodeURIComponent
+      )
     }
   };
 
   function init(converter, defaultAttributes) {
     function set(name, value, attributes) {
       if (typeof document === 'undefined') {
+        return
+      }
+
+      // name = encodeURIComponent(name).replace(/%(2[346B]|5[BDE]|60|7C)/g, decodeURIComponent);
+
+      // Return when name contains invalid characters
+      // eslint-disable-next-line no-control-regex
+      if (/[=,; \t\r\n\x0b\x0c]/.test(name)) {
+        // throw new TypeError('Cookie names cannot contain any of the following \'=,; \\t\\r\\n\\x0b\\x0c\'');
+        console.warn('Cookie names cannot contain any of the following \'=,; \\t\\r\\n\\x0b\\x0c\'');
         return
       }
 
@@ -61,10 +59,6 @@
       if (attributes.expires) {
         attributes.expires = attributes.expires.toUTCString();
       }
-
-      // name = encodeURIComponent(name)
-      //   .replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent)
-      //   .replace(/[()]/g, escape)
 
       var stringifiedAttributes = '';
       for (var attributeName in attributes) {
@@ -89,18 +83,13 @@
       }
 
       return (document.cookie =
-        converter.write(name, 'name') +
-        '=' +
-        converter.write(value, 'value') +
-        stringifiedAttributes)
+        name + '=' + converter.write(value, name) + stringifiedAttributes)
     }
 
     function get(name) {
       if (typeof document === 'undefined' || (arguments.length && !name)) {
         return
       }
-
-      name = converter.read(name, 'name');
 
       // To prevent the for loop in the first place assign an empty array
       // in case there are no cookies at all.
@@ -112,7 +101,7 @@
 
         try {
           var found = decodeURIComponent(parts[0]);
-          if (!(found in jar)) jar[found] = converter.read(value, found, 'value');
+          if (!(found in jar)) jar[found] = converter.read(value, found);
           if (name === found) {
             break
           }

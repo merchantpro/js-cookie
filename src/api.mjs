@@ -7,6 +7,18 @@ function init(converter, defaultAttributes) {
       return
     }
 
+    // name = encodeURIComponent(name).replace(/%(2[346B]|5[BDE]|60|7C)/g, decodeURIComponent);
+
+    // Return when name contains invalid characters
+    // eslint-disable-next-line no-control-regex
+    if (/[=,; \t\r\n\x0b\x0c]/.test(name)) {
+      // throw new TypeError('Cookie names cannot contain any of the following \'=,; \\t\\r\\n\\x0b\\x0c\'');
+      console.warn(
+        "Cookie names cannot contain any of the following '=,; \\t\\r\\n\\x0b\\x0c'"
+      )
+      return
+    }
+
     attributes = assign({}, defaultAttributes, attributes)
 
     if (typeof attributes.expires === 'number') {
@@ -15,10 +27,6 @@ function init(converter, defaultAttributes) {
     if (attributes.expires) {
       attributes.expires = attributes.expires.toUTCString()
     }
-
-    // name = encodeURIComponent(name)
-    //   .replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent)
-    //   .replace(/[()]/g, escape)
 
     var stringifiedAttributes = ''
     for (var attributeName in attributes) {
@@ -43,18 +51,13 @@ function init(converter, defaultAttributes) {
     }
 
     return (document.cookie =
-      converter.write(name, 'name') +
-      '=' +
-      converter.write(value, 'value') +
-      stringifiedAttributes)
+      name + '=' + converter.write(value, name) + stringifiedAttributes)
   }
 
   function get(name) {
     if (typeof document === 'undefined' || (arguments.length && !name)) {
       return
     }
-
-    name = converter.read(name, 'name')
 
     // To prevent the for loop in the first place assign an empty array
     // in case there are no cookies at all.
@@ -66,7 +69,7 @@ function init(converter, defaultAttributes) {
 
       try {
         var found = decodeURIComponent(parts[0])
-        if (!(found in jar)) jar[found] = converter.read(value, found, 'value')
+        if (!(found in jar)) jar[found] = converter.read(value, found)
         if (name === found) {
           break
         }

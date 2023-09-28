@@ -62,9 +62,9 @@
         attributes.expires = attributes.expires.toUTCString();
       }
 
-      name = encodeURIComponent(name)
-        .replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent)
-        .replace(/[()]/g, escape);
+      // name = encodeURIComponent(name)
+      //   .replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent)
+      //   .replace(/[()]/g, escape)
 
       var stringifiedAttributes = '';
       for (var attributeName in attributes) {

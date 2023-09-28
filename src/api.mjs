@@ -16,9 +16,9 @@ function init(converter, defaultAttributes) {
       attributes.expires = attributes.expires.toUTCString()
     }
 
-    name = encodeURIComponent(name)
-      .replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent)
-      .replace(/[()]/g, escape)
+    // name = encodeURIComponent(name)
+    //   .replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent)
+    //   .replace(/[()]/g, escape)
 
     var stringifiedAttributes = ''
     for (var attributeName in attributes) {
@@ -43,7 +43,10 @@ function init(converter, defaultAttributes) {
     }
 
     return (document.cookie =
-      converter.write(name, 'name') + '=' + converter.write(value, 'value') + stringifiedAttributes)
+      converter.write(name, 'name') +
+      '=' +
+      converter.write(value, 'value') +
+      stringifiedAttributes)
   }
 
   function get(name) {
@@ -51,7 +54,7 @@ function init(converter, defaultAttributes) {
       return
     }
 
-    name = converter.read(name, 'name');
+    name = converter.read(name, 'name')
 
     // To prevent the for loop in the first place assign an empty array
     // in case there are no cookies at all.
